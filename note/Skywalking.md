@@ -45,3 +45,5 @@ ASM 是它们中最强大的一个，使用它可以动态修改类、方法，�
 参考：https://www.cnblogs.com/wucy/p/13532534.html
 
 [SkyAPM-dotnet](https://github.com/SkyAPM/SkyAPM-dotnet) 是SkyWalking在.Net Core端的探针实现，其主要的收集日志的手段就是基于DiagnosticSource来进行诊断跟踪的。
+
+当我们通过ConfigureWebHostDefaults配置Web主机的时候，程序就已经默认给我们注入了诊断名称为Microsoft.AspNetCore的DiagnosticListener和DiagnosticSource
