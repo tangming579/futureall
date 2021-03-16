@@ -1,11 +1,3 @@
-## 部署相关
-
-### Docker
-
-### k8s
-
-### Nginx
-
 ## 数据库
 
 ### MySQL
@@ -22,6 +14,8 @@ innodb_buffer池相关的，以及跟读数据块最相关的核心函数buf_pag
 
 buf_page_get_gen函数的作用是从Buffer bool里面读数据页
 
+- 索引
+
 - 主从复制
 
 - 集群
@@ -30,17 +24,33 @@ buf_page_get_gen函数的作用是从Buffer bool里面读数据页
 
 ### Redis
 
+
+
+### MongoDB
+
+
+
+### EleasticSearch
+
 ## 通信
 
 ### NIO、Netty
 
 ### RabbitMQ
 
+## 部署相关
 
+### Docker
+
+### k8s
+
+### Nginx
 
 ## 语言相关
 
 ### Java
+
+Java类加载流程
 
 ### Spring Boot
 
