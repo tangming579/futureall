@@ -26,11 +26,27 @@ buf_page_get_gen函数的作用是从Buffer bool里面读数据页
 
 
 
-### MongoDB
+### MongoDB与EleasticSearch
+
+- 相同点：
+
+1、都是以json格式管理数据的nosql数据库。
+2、都支持CRUD操作。
+3、都支持聚合和全文检索。
+4、都支持分片和复制。
+5、都支持阉割版的join操作。
+6、都支持处理超大规模数据。
+7、目前都不支持事务或者叫支持阉割版的事务。
+
+- 不同点：
+
+1、开发语言不同：ES的Java语言(restful)，Mongo是C++语言(driver)，从开发角度来看，ES对Java更方便
+2、分片方式：ES是hash，Mongo是range和hash
+3、分布式：ES的主副分片自动组合和配置，Mongo需要手动配置集群“路由+服务配置+sharding”
+4、索引：ES自建倒排索引，检索力度强，Mongo手动创建索引（B树），不支持倒排索引；es所有字段自动索引，mongodb的字段需要手动索引。
+5、检索字段：ES全文检索，可用的检索插件较多，Mongo对索引字段个数有限制，全文检索效率低乃至不采用
 
 
-
-### EleasticSearch
 
 ## 通信
 
