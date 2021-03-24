@@ -1,3 +1,7 @@
+## Docker Compose
+
+
+
 ## Docker Swarm
 
 ### 基本概念
@@ -18,11 +22,11 @@ Docker Swarm，主要包含以下概念：
 
 - Service
 
-  Service是一类容器。 对用户来说，Service就是与Swarm交互的最核心内容。 Service有两种运行模式，一是replicated，指定一个Service运行容器的数量； 二是global，在所有符合运行条件的Node上，都运行一个这类容器。
+  Service（服务）是一类容器。 对用户来说，Service就是与Swarm交互的最核心内容。 Service有两种运行模式，一是replicated，按照一定规则在各个工作节点上运行指定个数的任务； 二是global，每个工作节点上运行一个任务。
 
 - Task
 
-  Task就是指运行一个容器的任务，是Swarm执行命令的最小单元。 要成功运行一个Service，需要执行一个或多个Task（取决于一个Service的容器数量）
+  Task（任务）就是指运行一个容器的任务，是Swarm执行命令的最小单元。 要成功运行一个Service，需要执行一个或多个Task（取决于一个Service的容器数量）
 
 - Load balancing
 
@@ -30,7 +34,7 @@ Docker Swarm，主要包含以下概念：
 
 ### 步骤
 
-1. 创建集群
+#### 1.  创建集群
 
 ```sh
  #创建新的Swarm
@@ -42,7 +46,7 @@ Docker Swarm，主要包含以下概念：
 - 使用docker info 可以查看当前 Swarm 状态
 - 使用 docker node ls 可以查看节点信息
 
-2. 加入集群
+#### 2. 加入集群
 
 ```sh
 #在manager节点上执行，可查看其他节点如何加入swarm
@@ -50,7 +54,7 @@ docker swarm join-token worker
 docker swarm join-token manager
 ```
 
-3. 部署服务到 Swarm 中
+#### 3. 部署服务到 Swarm 中
 
 ```sh
 docker service create --replicas 1 --name helloworld alpine ping docker.com
@@ -61,12 +65,18 @@ docker service create --replicas 1 --name helloworld alpine ping docker.com
 - `--replicas` ：指定节点上运行的任务数
 -  `alpine ping docker.com`： alpine是一个非常小的 Docker 镜像，定义容器执行的命令是 ping `docker.com`
 
+
+
+> replicated services 按照一定规则在各个工作节点上运行指定个数的任务。
+> global services 每个工作节点上运行一个任务
+> 两种模式通过 docker service create 的 --mode 参数指定。下图展示了容器、任务、服务的关系。
+
 ```sh
- #查看运行的服务
- docker service ls
+#查看运行的服务
+docker service ls
 ```
 
-4. 在 Swarm 中查看服务
+#### 4. 在 Swarm 中查看服务
 
 ```sh
 docker service inspect --pretty helloworld
@@ -74,9 +84,9 @@ docker service inspect --pretty helloworld
 docker service inspect helloworld
 ```
 
-5. 改变服务的伸缩性
+#### 5. 改变服务的伸缩性
 
-   容器运行的 service 被叫做 “tasks”
+容器运行的 service 被叫做 “tasks”，以下命令可以使服务进行弹性伸缩
 
 ```sh
 #docker service scale <SERVICE-ID>=<NUMBER-OF-TASKS>
@@ -94,7 +104,7 @@ helloworld.5.ba19kca06l18zujfwxyc5lkyn  alpine  worker2   Running        Running
 
 可以使用 docker ps 命令在各个节点上查看是否有运行的容器
 
-6. 删除 swarm 服务
+#### 6. 删除 swarm 服务
 
 ```sh
 docker service rm helloworld
@@ -102,41 +112,43 @@ docker service rm helloworld
 docker service inspect helloworld
 ```
 
-7. 更新 swarm 服务
+#### 7. 滚动更新 swarm 服务
 
-   1. 以 Redis 3.0.6 为基础部署服务，然后将服务升级为 Redis 3.0.7
+1. 以 Redis 3.0.6 为基础部署服务，然后将服务升级为 Redis 3.0.7
 
-   2. 部署 Redis 服务，配置10 秒升级延迟
+2. 部署 Redis 服务，配置10 秒升级延迟
 
-      ```sh
-       docker service create \
-        --replicas 3 \
-        --name redis \
-        --update-delay 10s \
-        redis:3.0.6
-      
-      0u6a4s31ybk7yw2wyvtikmu50
-      ```
+   ```sh
+    docker service create \
+     --replicas 3 \
+     --name redis \
+     --update-delay 10s \
+     redis:3.0.6
+   
+   0u6a4s31ybk7yw2wyvtikmu50
+   ```
 
-   3. 查看 Redis 服务
+3. 查看 Redis 服务
 
-      ```
-      docker service inspect --pretty redis
-      ```
+   ```
+   docker service inspect --pretty redis
+   ```
 
-   4. 升级 Redis 服务
+4. 升级 Redis 服务
 
-      ```
-      docker service update --image redis:3.0.7 redis
-      ```
+   ```
+   docker service update --image redis:3.0.7 redis
+   ```
 
-      The scheduler applies rolling updates as follows by default:
+   The scheduler applies rolling updates as follows by default:
 
-      - Stop the first task.
-      - Schedule update for the stopped task.
-      - Start the container for the updated task.
-      - If the update to a task returns `RUNNING`, wait for the specified delay period then start the next task.
-      - If, at any time during the update, a task returns `FAILED`, pause the update.
+   - Stop the first task.
+   - Schedule update for the stopped task.
+   - Start the container for the updated task.
+   - If the update to a task returns `RUNNING`, wait for the specified delay period then start the next task.
+   - If, at any time during the update, a task returns `FAILED`, pause the update.
 
-   5. 运行  ` docker service inspect --pretty` redis
-   6. 运行  `docker service ps <SERVICE-ID>`
+5. 运行  ` docker service inspect --pretty` redis
+6. 运行  `docker service ps <SERVICE-ID>`
+
+## DockerUI-Portainer
