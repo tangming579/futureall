@@ -57,19 +57,20 @@ docker swarm join-token manager
 #### 3. 部署服务到 Swarm 中
 
 ```sh
-docker service create --replicas 1 --name helloworld alpine ping docker.com
+docker service create --name helloworld --mode replicated --replicas 3 alpine
+docker service create --name helloworld --mode global alpine
 ```
 
 -  `docker service create` ：创建服务
 - `--name` ：服务的名字为 `helloworld`.
 - `--replicas` ：指定节点上运行的任务数
--  `alpine ping docker.com`： alpine是一个非常小的 Docker 镜像，定义容器执行的命令是 ping `docker.com`
+-  `alpine`： alpine是一个非常小的 Docker 镜像
 
 
 
 > replicated services 按照一定规则在各个工作节点上运行指定个数的任务。
 > global services 每个工作节点上运行一个任务
-> 两种模式通过 docker service create 的 --mode 参数指定。下图展示了容器、任务、服务的关系。
+> 两种模式通过 docker service create 的 --mode 参数指定。
 
 ```sh
 #查看运行的服务
