@@ -346,6 +346,12 @@ Cluster Nodes命令和Cluster Meet命令，添加和连接节点形成集群。
 
 # 通信
 
+## HTTPS
+
+
+
+Token
+
 ## TCP
 
 **为什么连接的时候是三次握手，关闭的时候却是四次握手？**
@@ -509,11 +515,26 @@ R-B Tree，全称是Red-Black Tree，又称为“红黑树”，它一种特殊�
 
 # JVM
 
-## 内存结构
+## JVM与CLR
 
-<p>
-<image src="./documents/img/3.jpg"></image>    
-</p>
+**相同点**
+
+● 两者都包括垃圾收集
+
+● 两者都采用基于堆栈的操作
+
+● 两者都包括运行时级安全性
+
+● 两者都有异常处理方法
+
+**不同点**
+
+● CLR使用JIT编译器，JVM使用称为Java HotSpot的专用JIT编译器
+
+● CLR包含闭包，async await协程和指针声明/操作的指令，而JVM则没有
+
+● 值类型的处理，JVM中根据逃逸分析的参数来决定何时哪些对象在堆上创建，否则在栈或者寄存器上创建以减少内存空间，而在CLR中是原生支持值类型
+
 
 ## 编译过程
 
@@ -958,6 +979,26 @@ Error：
 《Effictive Java》：对于可以恢复的情况使用检查异常，对于编程中的错误使用运行异常
 
 ## C#
+
+### 处理管道的区别
+
+参考：http://www.fwhyy.com/2020/04/dotnet-core-3-request-processing-pipeline-and-middleware/
+
+**ASP.NET 管道：**
+
+1. 程序在 IIS 中运行后，会启动一个名为 w3wp.exe 的进程，利用 aspnet_isapi.dll 加载 .NET 运行时
+2. 随后运行时 IsapiRuntime 会被加载，加载后，会接管整个 HTTP 请求，然后创建一个 IsapiWorkerRequest 对象来包装 HTTP 请求
+3.  IsapiWorkerRequest 传递给 ASP.NET 的 HttpRuntime ，这时请求就进入了 ASP.NET 的管道；
+4. HttpRuntime 会根据 IsapiWorkerRequest 对象创建表示当前 HTTP 请求上下文 (Context) 对象 HttpContext；
+5. HttpContext 创建后，HttpRuntime 会使用 HttpApplicationFactory 创建当前的 HttpApplication 对象，HttpApplication 对象会有多个，处理完后会被释放到 HttpApplication 的对象池中；
+6. 到了 HttpApplication 中之后，就是我们所熟悉的 HttpModule 和 HttpHandler 了，先经过 HttpModule ，比如 ASP.NET 自带的授权、身份认证、缓存等就是通过 HttpModule 处理，我们也可以自定义自己的 HttpModule ，而具体的 aspx、ascx 等就是由 HttpHandler 处理。
+
+**ASP.NET Core 管道：**
+
+在 Core 中请求处理管道由一个服务器和一组中间件来组成，服务器默认就是内置的 Kestrel，请求经过中间件处理完后，进入下一个中间件，然后按照顺序依次返回。相比较原来的 HttpModule ，更简单和轻量级。
+
+1. Modules, handlers, *Global.asax.cs*, *Web.config* 都被去掉了
+2. Modules和Handlers都被中间件取代了，Web.config 通过中间件代码来配置
 
 # Spring
 
