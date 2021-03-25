@@ -1,6 +1,129 @@
+## Docker 基本操作
+
+### 安装 Docker
+
+安装docker
+
+```sh
+#安装Docker
+sudo yum install docker-ce docker-ce-cli containerd.io
+#启用docker
+sudo systemctl start docker
+sudo systemctl enable docker
+```
+
+修改配置
+
+```sh
+#创建文件夹
+sudo mkdir -p /etc/docker
+#编辑/etc/docker/daemon.json文件，并输入国内镜像源地址
+sudo vi /etc/docker/daemon.json
+
+{
+  "registry-mirrors": ["https://registry.docker-cn.com"]
+}
+#重启服务
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+```
+
+### 创建.Net Core 项目
+
+新建.Net Core 项目，添加Docker支持：
+
+```dockerfile
+#CentOS使用下面的系统镜像
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-buster-slim AS base
+##Ubuntu使用下面的系统镜像
+#FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-bionic AS base
+WORKDIR /app
+COPY . .
+EXPOSE 5000
+
+#设置时区
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+#中文字符支持
+RUN apt-get clean && apt-get -y update && apt-get install -y locales && locale-gen zh_CN.UTF-8
+ENV LANG='zh_CN.UTF-8' LANGUAGE='zh_CN.UTF-8' LC_ALL='zh_CN.UTF-8'
+#执行命令
+ENTRYPOINT ["dotnet", "FlyGetter.dll"]
+```
+
+  dockerfile文件指令说明：
+
+- FROM -指定所创建镜像的基础镜像
+- WORKDIR-配置工作目录
+- EXPOSE-声明镜像内服务监听的端口 （可以不写，因为我们具体映射的端口可以在运行的时候指定）
+- COPY-复制内容到镜像  (. .代表当前目录)
+- ENTRYPOINT-启动镜像的默认人口命令
+
+发布项目，拷贝publish文件夹至CentOS，目录：app/publish
+
+### 部署项目
+
+```shell
+cd /app/publish
+
+#单容器部署：
+docker build -t mysystem .
+docker run --name myapi  -d -p 19121:19121 --restart=always -v /var/log/mysystem:/app/log mysystem
+
+#docker compose 部署
+# 执行镜像构建，启动
+docker-compose up -d
+```
+
+### 常用命令
+
+```
+#查看挂掉的容器：
+docker ps -a
+#查看指定容器的日志：
+docker logs b1d05f65856f
+#进入docker容器：
+docker exec -it containerID /bin/bash
+#docker安装vim：
+apt-get update
+apt-get install vim
+
+# 查看所有正在运行的容器
+docker-compose ps
+# 显示容器运行日志
+docker-compose logs
+```
+
+```shell
+docker build -t demotest .    构建 demotest镜像
+docker inspect demotest     查看 运行容器的详情
+docker ps -a                      查看当前所有的容器
+docker rm $(docker ps -aq)     删除所有容器
+docker rmi $(docker images -q)   删除所有镜像
+docker cp /www/runoob 96f7f14e99ab:/www/  将主机/www/runoob目录拷贝到容器的/www目录下
+docker commit f3aff5ca8aa3 mynetweb   将容器f3aff5ca8aa3生成镜像mynetweb
+docker save -o nginx.tar nginx:latest  nginx.tar为目标文件，nginx:latest是源镜像名
+docker load -i nginx.tar
+docker tag [镜像id] [新镜像名称]:[新镜像标签] 
+```
+
+
+
 ## Docker Compose
 
+### 安装 Docker Compose
 
+最新版本：https://github.com/docker/compose/releases
+
+```shell
+sudo curl -L "https://github.com/docker/compose/releases/download/1.26.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+```
+
+修改目录可执行权限：
+
+```shell
+sudo chmod +x /usr/local/bin/docker-compose
+```
 
 ## Docker Swarm
 
@@ -37,8 +160,16 @@ Docker Swarm，主要包含以下概念：
 #### 1.  创建集群
 
 ```sh
- #创建新的Swarm
- docker swarm init --advertise-addr <MANAGER-IP>
+#开放 swarm 所需端口
+firewall-cmd --add-port=2376/tcp --permanent
+firewall-cmd --add-port=2377/tcp --permanent
+firewall-cmd --add-port=7946/tcp --permanent
+firewall-cmd --add-port=7946/udp --permanent
+firewall-cmd --add-port=4789/udp --permanent
+systemctl restart firewalld
+
+#创建新的 swarm
+docker swarm init --advertise-addr <MANAGER-IP>
 ```
 
 - --advertise-addr 用于指定其他节点可访问的ip
@@ -154,4 +285,4 @@ docker service inspect helloworld
 
 ## DockerUI
 
-Portainer
+Portainer、Docker UI、Shipyard等
